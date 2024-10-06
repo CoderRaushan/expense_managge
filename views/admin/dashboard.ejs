@@ -107,16 +107,30 @@ form {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         fetch('/admin/graph-data')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
             .then(data => {
                 const labels = [...new Set(data.map(item => item.date))]; // Unique dates for x-axis
                 const costsByDate = {};
-                // Aggregate costs by date
+                const detailsByDate = {};
+    
+                // Aggregate costs and store details by date
                 data.forEach(item => {
                     if (!costsByDate[item.date]) {
                         costsByDate[item.date] = 0; // Initialize if not present
+                        detailsByDate[item.date] = []; // Initialize details array
                     }
                     costsByDate[item.date] += item.cost; // Sum costs for the same date
+                    // Store each item's details
+                    detailsByDate[item.date].push({
+                        itemName: item.item_name, // Assuming 'item_name' is the field in your data
+                        cost: item.cost,
+                        username: item.username // Assuming 'username' is the field in your data
+                    });
                 });
     
                 // Prepare the data for the chart
@@ -140,17 +154,45 @@ form {
                             y: {
                                 beginAtZero: true // Y-axis starts from 0
                             }
+                        },
+                        plugins: {
+                            tooltip: {
+                                enabled: true, // Enable tooltips
+                                callbacks: {
+                                    title: function(tooltipItems) {
+                                        // Show date as title
+                                        return tooltipItems[0].label;
+                                    },
+                                    label: function(tooltipItem) {
+                                        const date = tooltipItem.label;
+                                        const details = detailsByDate[date];
+                                        let label = `Total: ₹${tooltipItem.raw}`; // Use tooltipItem.raw to get the value
+    
+                                        // Adding details
+                                        if (details) {
+                                            label += '\nDetails:\n';
+                                            details.forEach(detail => {
+                                                label += `- ${detail.itemName}: ₹${detail.cost} (User: ${detail.username})\n`;
+                                            });
+                                        }
+                                        return label.split("\n"); // Return as an array to display in tooltip
+                                    }
+                                }
+                            }
                         }
                     }
                 });
+            })
+            .catch(error => {
+                console.error('Error fetching the graph data:', error);
             });
     </script>
+    
     <script>
         function toggleEditForm(userId, itemId) {
             const form = document.getElementById(`editForm-${userId}-${itemId}`);
             form.style.display = form.style.display === 'none' ? 'block' : 'none';
         }
     </script>
-
 </body>
 </html>

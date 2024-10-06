@@ -107,6 +107,7 @@ router.get('/graph-data', async (req, res) => {
                     item_name: item.item_name,
                     cost: item.cost,
                     date: item.date.toLocaleDateString(), // Convert date to string for labeling
+                    username: user.username,
                 });
             });
         });
