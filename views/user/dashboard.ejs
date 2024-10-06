@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #0056b3;
+            /* Darker shade on hover */
+        }
+
+        h3 {
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            
+        }
+
+        li {
+            background-color: white;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            max-width: 100%;
+            margin: auto;
+            display: block;
+            height: 100vh;
+            width: 100%;
+        }
+        #add_
+        {
+            color: black;
+            text-decoration:solid;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Welcome, <%= user.username %>
+    </h2>
+    <a href="/user/add-item" id="add_">Add Item</a>
+    <h3>Your Items</h3>
+    <ul>
+        <% user.items.forEach(item=> { %>
+            <li>
+                <%= item.item_name %> - $<%= item.cost %> - <%= item.category %> - <%= item.date.toDateString() %>
+            </li>
+            <% }) %>
+    </ul>
+    <h3>Expense Graph</h3>
+    <canvas id="expenseChart"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        fetch('/user/graph-data')
+            .then(response => response.json())
+            .then(data => {
+                const labels = data.map(item => item.date);
+                const costs = data.map(item => item.cost);
+                const name = data.map(item => item.item_name);
+                const ctx = document.getElementById('expenseChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar', // Type of the chart
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Expenses',
+                            data: costs,
+                            // Removed additional styling
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)', // Light background color
+                            borderColor: 'rgba(75, 192, 192, 1)', // Border color for the bars
+                            borderWidth: 1 // Border width
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true // Y-axis starts from 0
+                            }
+                        }
+                    }
+                });
+            });
+    </script>
+</body>
+
+</html>

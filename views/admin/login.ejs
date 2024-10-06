@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4; /* Light background for the page */
+            color: #333; /* Dark text color */
+            margin: 0;
+            padding: 20px; /* Padding around the body */
+        }
+        h2 {
+            text-align: center; /* Centered heading */
+            margin-bottom: 20px; /* Space below the heading */
+        }
+        form {
+            max-width: 400px; /* Maximum width for the form */
+            margin: 0 auto; /* Center the form */
+            padding: 20px; /* Padding inside the form */
+            background: white; /* White background for the form */
+            border-radius: 5px; /* Rounded corners */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+        label {
+            display: block; /* Block display for labels */
+            margin-bottom: 5px; /* Space between label and input */
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%; /* Full width inputs */
+            padding: 10px; /* Padding inside inputs */
+            margin-bottom: 20px; /* Space below each input */
+            border: 1px solid #ccc; /* Border style */
+            border-radius: 4px; /* Rounded corners for inputs */
+        }
+        button {
+            width: 100%; /* Full width button */
+            padding: 10px; /* Padding inside button */
+            background-color: #000; /* Black background for the button */
+            color: white; /* White text color */
+            border: none; /* Remove border */
+            border-radius: 4px; /* Rounded corners for button */
+            cursor: pointer; /* Pointer cursor on hover */
+            font-size: 16px; /* Font size for button */
+        }
+        button:hover {
+            background-color: #444; /* Darker background on hover */
+        }
+    </style>
+</head>
+<body>
+    <h2>Admin Login</h2>
+    <form action="/admin/login" method="POST">
+        <label for="username">Username</label>
+        <input type="text" name="username" required>
+    
+        <label for="password">Password</label>
+        <input type="password" name="password" required>
+    
+        <button type="submit">Login</button>
+    </form>
+</body>
+</html>
