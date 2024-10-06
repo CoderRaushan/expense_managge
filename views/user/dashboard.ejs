@@ -12,7 +12,6 @@
             color: #333;
             margin: 0;
             padding: 20px;
-            
         }
 
         h2 {
@@ -32,7 +31,6 @@
 
         a:hover {
             color: #0056b3;
-            /* Darker shade on hover */
         }
 
         h3 {
@@ -43,7 +41,6 @@
         ul {
             list-style-type: none;
             padding: 0;
-            
         }
 
         li {
@@ -61,25 +58,24 @@
             height: 100vh;
             width: 100%;
         }
-        #add_
-        {
+
+        #add_ {
             color: black;
-            text-decoration:solid;
+            text-decoration: solid;
         }
     </style>
 </head>
 
 <body>
-    <h2>Welcome, <%= user.username %>
-    </h2>
+    <h2>Welcome, <%= user.username %></h2>
     <a href="/user/add-item" id="add_">Add Item</a>
     <h3>Your Items</h3>
     <ul>
-        <% user.items.forEach(item=> { %>
+        <% user.items.forEach(item => { %>
             <li>
                 <%= item.item_name %> - $<%= item.cost %> - <%= item.category %> - <%= item.date.toDateString() %>
             </li>
-            <% }) %>
+        <% }) %>
     </ul>
     <h3>Expense Graph</h3>
     <canvas id="expenseChart"></canvas>
@@ -88,9 +84,15 @@
         fetch('/user/graph-data')
             .then(response => response.json())
             .then(data => {
-                const labels = data.map(item => item.date);
+                const labels = data.map(item => {
+                    // Format date to dd-mm-yyyy
+                    const date = new Date(item.date);
+                    const formattedDate = `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()}`;
+                    return `${item.item_name} - ₹${item.cost} - ${formattedDate}`; // Combine item name, cost, and formatted date
+                });
+
                 const costs = data.map(item => item.cost);
-                const name = data.map(item => item.item_name);
+                
                 const ctx = document.getElementById('expenseChart').getContext('2d');
                 new Chart(ctx, {
                     type: 'bar', // Type of the chart
@@ -99,7 +101,6 @@
                         datasets: [{
                             label: 'Expenses',
                             data: costs,
-                            // Removed additional styling
                             backgroundColor: 'rgba(75, 192, 192, 0.2)', // Light background color
                             borderColor: 'rgba(75, 192, 192, 1)', // Border color for the bars
                             borderWidth: 1 // Border width
@@ -107,8 +108,32 @@
                     },
                     options: {
                         scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Item Name - Cost - Date' // Add title for the x-axis
+                                }
+                            },
                             y: {
                                 beginAtZero: true // Y-axis starts from 0
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    title: function (tooltipItems) {
+                                        // Show the item name, cost, and date in the tooltip
+                                        return tooltipItems.map(item => {
+                                            const index = item.dataIndex;
+                                            return labels[index]; // Return the combined label
+                                        });
+                                    },
+                                    label: function (tooltipItem) {
+                                        // Show the cost in the label
+                                        const cost = tooltipItem.raw; // Get the cost for this item
+                                        return `Cost: ₹${cost}`; // Return cost
+                                    }
+                                }
                             }
                         }
                     }
